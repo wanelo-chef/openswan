@@ -1,9 +1,6 @@
 openswan Cookbook (WIP)
 =================
-TODO: Enter the cookbook description here.
-
-e.g.
-This cookbook makes your favorite breakfast sandwhich.
+Install and configure openswan for VPN access.
 
 Requirements
 ------------
