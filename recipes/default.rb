@@ -83,7 +83,7 @@ end
 
 service "xl2tpd" do
   supports :status => true, :restart => true, :start => true, :stop => true
-  action [ :enable, :start ]
+  action :start
 end
 
 remote_file "/var/tmp/linux-image-3.8.4-joyent-ubuntu-12-opt_1.0.0_amd64.deb" do
@@ -95,7 +95,7 @@ remote_file "/var/tmp/linux-headers-3.8.4-joyent-ubuntu-12-opt_1.0.0_amd64.deb" 
 end
 
 execute "install custom joyent linux headers" do
-  command "dpkg --install /var/tmp/linux-headers-3.8.4-joyent-ubuntu-12-opt_1.0.0_amd64.deb && dpkg --install /var/tmp/linux-image-3.8.4-joyent-ubuntu-12-opt_1.0.0_amd64.deb"
+  command "dpkg --install --force all /var/tmp/linux-headers-3.8.4-joyent-ubuntu-12-opt_1.0.0_amd64.deb && dpkg --install --force all /var/tmp/linux-image-3.8.4-joyent-ubuntu-12-opt_1.0.0_amd64.deb"
 end
 
 execute "restart xl2tpd and ipsec" do
