@@ -17,16 +17,16 @@
 # limitations under the License.
 #
 
+chef_gem "ipaddr_extensions" do
+  action :install
+end
+
 execute "apt-get update" do
   command "apt-get update"
 end
 
 package "openswan" do
   action :install
-end
-
-execute "turn on SNAT" do
-  command "iptables -t nat -I POSTROUTING -o eth0 -j SNAT --to #{node['ipaddress']}"
 end
 
 execute "turn on ipv4 forwarding" do
@@ -106,6 +106,14 @@ end
 execute "install custom joyent linux headers" do
   command "dpkg --install --force-confnew /var/tmp/linux-headers-3.8.4-joyent-ubuntu-12-opt_1.0.0_amd64.deb && dpkg --install --force-confnew /var/tmp/linux-image-3.8.4-joyent-ubuntu-12-opt_1.0.0_amd64.deb"
   not_if "ls /lib/modules/3.8.4-joyent-ubuntu-12-opt/kernel"
+end
+
+execute "turn on public SNAT" do
+  command "iptables -t nat -I POSTROUTING -o eth0 -j SNAT --to #{node['ipaddress']}"
+end
+
+execute "turn on private SNAT" do
+  command "iptables -t nat -I POSTROUTING -o eth1 -j SNAT --to #{node['privateaddress']}"
 end
 
 execute "restart xl2tpd and ipsec" do
