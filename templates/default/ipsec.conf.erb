@@ -25,7 +25,7 @@ conn L2TP-PSK-noNAT
     keylife=1h
     type=transport
      ### NOTE:  "left" here is "the VPN server in the cloud".  Change this to your public IP.
-    left=198.55.55.183
+    left=<%= node[:ipaddress] %>
     leftprotoport=17/1701
     right=%any
     rightprotoport=17/%any

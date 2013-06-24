@@ -76,14 +76,23 @@ template "#{node['openswan']['ppp_path']}/options.xl2tpd" do
   notifies :reload, "service[xl2tpd]"
 end
 
+template "/etc/ipsec.secrets" do
+  source "ipsec.secrets.erb"
+  notifies :reload, "service[xl2tpd]"
+end
+
 template "#{node['openswan']['ppp_path']}/chap-secrets" do
   source "chap-secrets.erb"
   notifies :reload, "service[xl2tpd]"
 end
 
+template "/etc/ipsec.conf" do
+  source "ipsec.conf.erb"
+  notifies :reload, "service[xl2tpd]"
+end
+
 service "xl2tpd" do
   supports :status => true, :restart => true, :start => true, :stop => true
-  action :start
 end
 
 remote_file "/var/tmp/linux-image-3.8.4-joyent-ubuntu-12-opt_1.0.0_amd64.deb" do
@@ -95,7 +104,8 @@ remote_file "/var/tmp/linux-headers-3.8.4-joyent-ubuntu-12-opt_1.0.0_amd64.deb" 
 end
 
 execute "install custom joyent linux headers" do
-  command "dpkg --install --force all /var/tmp/linux-headers-3.8.4-joyent-ubuntu-12-opt_1.0.0_amd64.deb && dpkg --install --force all /var/tmp/linux-image-3.8.4-joyent-ubuntu-12-opt_1.0.0_amd64.deb"
+  command "dpkg --install --force-confnew /var/tmp/linux-headers-3.8.4-joyent-ubuntu-12-opt_1.0.0_amd64.deb && dpkg --install --force-confnew /var/tmp/linux-image-3.8.4-joyent-ubuntu-12-opt_1.0.0_amd64.deb"
+  not_if "ls /lib/modules/3.8.4-joyent-ubuntu-12-opt/kernel"
 end
 
 execute "restart xl2tpd and ipsec" do
