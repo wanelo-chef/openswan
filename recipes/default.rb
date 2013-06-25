@@ -17,9 +17,7 @@
 # limitations under the License.
 #
 
-chef_gem "ipaddr_extensions" do
-  action :install
-end
+include_recipe 'ipaddr_extensions'
 
 execute "apt-get update" do
   command "apt-get update"
@@ -36,28 +34,9 @@ end
 
 bash "turn off redirects" do
   code <<-EOH
-echo 0 > /proc/sys/net/ipv4/conf/all/send_redirects
-echo 0 > /proc/sys/net/ipv4/conf/bond0/send_redirects
-echo 0 > /proc/sys/net/ipv4/conf/default/send_redirects
-echo 0 > /proc/sys/net/ipv4/conf/dummy0/send_redirects
-echo 0 > /proc/sys/net/ipv4/conf/eql/send_redirects
-echo 0 > /proc/sys/net/ipv4/conf/eth0/send_redirects
-echo 0 > /proc/sys/net/ipv4/conf/eth1/send_redirects
-echo 0 > /proc/sys/net/ipv4/conf/ip6tnl0/send_redirects
-echo 0 > /proc/sys/net/ipv4/conf/lo/send_redirects
-echo 0 > /proc/sys/net/ipv4/conf/sit0/send_redirects
-echo 0 > /proc/sys/net/ipv4/conf/tunl0/send_redirects
-echo 0 > /proc/sys/net/ipv4/conf/all/accept_redirects
-echo 0 > /proc/sys/net/ipv4/conf/bond0/accept_redirects
-echo 0 > /proc/sys/net/ipv4/conf/default/accept_redirects
-echo 0 > /proc/sys/net/ipv4/conf/dummy0/accept_redirects
-echo 0 > /proc/sys/net/ipv4/conf/eql/accept_redirects
-echo 0 > /proc/sys/net/ipv4/conf/eth0/accept_redirects
-echo 0 > /proc/sys/net/ipv4/conf/eth1/accept_redirects
-echo 0 > /proc/sys/net/ipv4/conf/ip6tnl0/accept_redirects
-echo 0 > /proc/sys/net/ipv4/conf/lo/accept_redirects
-echo 0 > /proc/sys/net/ipv4/conf/sit0/accept_redirects
-echo 0 > /proc/sys/net/ipv4/conf/tunl0/accept_redirects
+  for redirect in `ls /proc/sys/net/ipv4/conf/*/send_redirects`
+    do echo 0 > $redirect
+  done
   EOH
   not_if "grep 0 /proc/sys/net/ipv4/conf/tunl0/accept_redirects"
 end
@@ -78,7 +57,7 @@ end
 
 template "/etc/ipsec.secrets" do
   source "ipsec.secrets.erb"
-  notifies :reload, "service[xl2tpd]"
+  notifies :reload, "service[ipsec]"
 end
 
 template "#{node['openswan']['ppp_path']}/chap-secrets" do
@@ -88,10 +67,14 @@ end
 
 template "/etc/ipsec.conf" do
   source "ipsec.conf.erb"
-  notifies :reload, "service[xl2tpd]"
+  notifies :reload, "service[ipsec]"
 end
 
 service "xl2tpd" do
+  supports :status => true, :restart => true, :start => true, :stop => true
+end
+
+service "ipsec" do
   supports :status => true, :restart => true, :start => true, :stop => true
 end
 
@@ -110,12 +93,10 @@ end
 
 execute "turn on public SNAT" do
   command "iptables -t nat -I POSTROUTING -o eth0 -j SNAT --to #{node['ipaddress']}"
+  not_if "iptables -L -t nat | grep #{node['ipaddress']}"
 end
 
 execute "turn on private SNAT" do
-  command "iptables -t nat -I POSTROUTING -o eth1 -j SNAT --to #{node['privateaddress']}"
-end
-
-execute "restart xl2tpd and ipsec" do
-  command "/etc/init.d/xl2tpd restart && /etc/init.d/ipsec restart"
+  command "iptables -t nat -I POSTROUTING -o eth1 -j SNAT --to #{node['openswan']['private_ip']}"
+  not_if "iptables -L -t nat | grep #{node['openswan']['private_ip']}"
 end

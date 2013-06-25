@@ -6,8 +6,8 @@ config setup
   ### NOTE:  this specifies what gets sent over the IPSEC tunnel.
   ### our ppp/L2TP link is 10.55.55.x, so we do that here.  Add private interfaces or loopbacks
   ### as you see fit.
-  ### 192.168.99.99 is your private eth1 ip address
-    virtual_private=%v4:<%= node[:openswan][:ppp_link_network] %>/24,%v4:<%= node[:privateaddress] %>/32
+  ### <%= node['openswan']['private_virtual_interface_ip'] %> is your private ip address
+    virtual_private=%v4:<%= node['openswan']['ppp_link_network'] %>/24,%v4:<%= node['openswan']['private_ip'] %>/32
     oe=off
     protostack=netkey
 
