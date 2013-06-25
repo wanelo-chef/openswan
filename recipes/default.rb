@@ -20,7 +20,8 @@
 include_recipe 'ipaddr_extensions'
 
 execute "apt-get update" do
-  command "apt-get update"
+  command "apt-get update && touch /etc/apt/openswan_update_completed"
+  not_if "ls /etc/apt/openswan_update_completed"
 end
 
 package "openswan" do
@@ -38,7 +39,7 @@ bash "turn off redirects" do
     do echo 0 > $redirect
   done
   EOH
-  not_if "grep 0 /proc/sys/net/ipv4/conf/tunl0/accept_redirects"
+  not_if "grep 0 /proc/sys/net/ipv4/conf/tunl0/send_redirects"
 end
 
 ["ppp", "xl2tpd"].each do |p|
@@ -94,9 +95,13 @@ end
 execute "turn on public SNAT" do
   command "iptables -t nat -I POSTROUTING -o eth0 -j SNAT --to #{node['ipaddress']}"
   not_if "iptables -L -t nat | grep #{node['ipaddress']}"
+  notifies :reload, "service[xl2tpd]"
+  notifies :reload, "service[ipsec]"
 end
 
 execute "turn on private SNAT" do
   command "iptables -t nat -I POSTROUTING -o eth1 -j SNAT --to #{node['openswan']['private_ip']}"
   not_if "iptables -L -t nat | grep #{node['openswan']['private_ip']}"
+  notifies :reload, "service[xl2tpd]"
+  notifies :reload, "service[ipsec]"
 end
