@@ -1,24 +1,36 @@
-openswan Cookbook (NOTE:  This is a work in progress)
+openswan Cookbook
 =================
-Install and configure openswan for VPN access.
+Install and configure openswan for per-user l2tp over ipsec vpn access.
 
 Requirements
 ------------
-TODO: List your cookbook requirements. Be sure to include any requirements this cookbook has on platforms, libraries, other cookbooks, packages, operating systems, etc.
+Currently tested only on Ubuntu 12, and expects a 'users' databag, with user records formatted like this:
+
+    {
+        "groups":["sysadmin", "vpn"],
+        "comment":"Jane Doe",
+        "username":"jane",
+        "id":"jane",
+        ...
+        "vpn_password":"someverysecurepassword"
+    }
+
 
 Attributes
 ----------
-TODO: List you cookbook attributes here.
+Default attributes should be overwritten to match your role or environment needs.
 
-Usage
------
-#### openswan::default
-TODO: Write usage instructions for each cookbook.
+    default['openswan']['ppp_link_network'] = "10.55.55.0"
+    default['openswan']['preshared_key'] = "letmein"
+    default['openswan']['private_virtual_interface_ip'] = "10.55.55.4"
+    default['openswan']['private_ip'] = `ifconfig eth1 | grep "inet addr" | awk 'BEGIN{FS=":"}{print $2}' | awk '{print $1}'`.strip
+    default['openswan']['private_ip_range'] = "10.55.55.5-10.55.55.100"
+    default['openswan']['xl2tpd_path'] = "/etc/xl2tpd"
+    default['openswan']['ppp_path'] = "/etc/ppp"
 
-Contributing
-------------
-TODO: (optional) If this is a public cookbook, detail the process for contributing. If this is a private cookbook, remove this section.
 
 License and Authors
 -------------------
 Authors: Blake Irvin <bixu@waenlo.com>
+
+Based on original work by Ryan Nelson <@ryancnelson>, with input from Eric Saxby <sax@wanelo.com> and Konstanin Gredeskoul <kig@wanelo.com>
