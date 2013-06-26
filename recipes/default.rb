@@ -19,6 +19,26 @@
 
 include_recipe 'ipaddr_extensions'
 
+vpn_group = Array.new
+
+users = []
+
+search(:users, 'groups:vpn').each do |u|
+  u['username'] ||= u['id']
+  vpn_group << u['username']
+
+  users << {:username => u['username'], :vpn_password => u['vpn_password']}
+end
+
+template "#{node['openswan']['ppp_path']}/chap-secrets" do
+  source "chap-secrets.erb"
+  variables({
+    :users => users
+  })
+notifies :restart, "service[xl2tpd]"
+notifies :restart, "service[ipsec]"
+end
+
 execute "apt-get update" do
   command "apt-get update && touch /etc/apt/openswan_update_completed"
   not_if "ls /etc/apt/openswan_update_completed"
@@ -48,27 +68,22 @@ end
 
 template "#{node['openswan']['xl2tpd_path']}/xl2tpd.conf" do
   source "xl2tpd.conf.erb"
-  notifies :reload, "service[xl2tpd]"
+  notifies :restart, "service[xl2tpd]"
 end 
 
 template "#{node['openswan']['ppp_path']}/options.xl2tpd" do
   source "options.xl2tpd.erb"
-  notifies :reload, "service[xl2tpd]"
+  notifies :restart, "service[xl2tpd]"
 end
 
 template "/etc/ipsec.secrets" do
   source "ipsec.secrets.erb"
-  notifies :reload, "service[ipsec]"
-end
-
-template "#{node['openswan']['ppp_path']}/chap-secrets" do
-  source "chap-secrets.erb"
-  notifies :reload, "service[xl2tpd]"
+  notifies :restart, "service[ipsec]"
 end
 
 template "/etc/ipsec.conf" do
   source "ipsec.conf.erb"
-  notifies :reload, "service[ipsec]"
+  notifies :restart, "service[ipsec]"
 end
 
 service "xl2tpd" do
@@ -95,13 +110,13 @@ end
 execute "turn on public SNAT" do
   command "iptables -t nat -I POSTROUTING -o eth0 -j SNAT --to #{node['ipaddress']}"
   not_if "iptables -L -t nat | grep #{node['ipaddress']}"
-  notifies :reload, "service[xl2tpd]"
-  notifies :reload, "service[ipsec]"
+  notifies :restart, "service[xl2tpd]"
+  notifies :restart, "service[ipsec]"
 end
 
 execute "turn on private SNAT" do
   command "iptables -t nat -I POSTROUTING -o eth1 -j SNAT --to #{node['openswan']['private_ip']}"
   not_if "iptables -L -t nat | grep #{node['openswan']['private_ip']}"
-  notifies :reload, "service[xl2tpd]"
-  notifies :reload, "service[ipsec]"
+  notifies :restart, "service[xl2tpd]"
+  notifies :restart, "service[ipsec]"
 end
