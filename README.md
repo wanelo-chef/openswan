@@ -33,4 +33,4 @@ License and Authors
 -------------------
 Authors: Blake Irvin <bixu@wanelo.com>
 
-Based on original work by Ryan Nelson <@ryancnelson>, with input from Eric Saxby <sax@wanelo.com> and Konstanin Gredeskoul <kig@wanelo.com>
+Based on original work by Ryan Nelson <ryan.nelson@joyent.com>, with input from Eric Saxby <sax@wanelo.com> and Konstanin Gredeskoul <kig@wanelo.com>
