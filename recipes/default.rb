@@ -44,6 +44,11 @@ execute "apt-get update" do
   not_if "ls /etc/apt/openswan_update_completed"
 end
 
+file "/var/log/ppp-ipupdown.log" do
+  action :touch
+  not_if { File.exists?("/var/log/ppp-ipupdown.log") } # No touching!
+end
+
 package "openswan" do
   action :install
 end
