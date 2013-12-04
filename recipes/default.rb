@@ -23,7 +23,7 @@ vpn_group = Array.new
 
 users = []
 
-search(:users, 'groups:vpn').each do |u|
+search(:users, 'groups:vpn AND NOT action:remove').each do |u|
   u['username'] ||= u['id']
   vpn_group << u['username']
 

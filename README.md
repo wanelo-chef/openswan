@@ -17,6 +17,22 @@ Currently tested only on Ubuntu 12, and expects a 'users' databag, with user rec
 }
 ```
 
+In order to remove user record without deleting the data bag, add a key to the databag as follows:
+
+```json
+{
+    "groups":["sysadmin", "vpn"],
+    "comment":"Jane Doe",
+    "username":"jane",
+    "id":"jane",
+    ...
+    "vpn_password":"someverysecurepassword",
+    "action": "remove"
+}
+```
+
+This follows a precedent set in the `users` cookbook maintained by Opscode.
+
 ## Attributes
 
 Default attributes should be overwritten to match your role or environment needs.
