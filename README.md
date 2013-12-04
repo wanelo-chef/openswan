@@ -1,23 +1,24 @@
-openswan Cookbook
-=================
+openswan
+========
 Install and configure openswan for per-user l2tp over ipsec vpn access.
 
-Requirements
-------------
+## Requirements
+
 Currently tested only on Ubuntu 12, and expects a 'users' databag, with user records formatted like this:
 
-    {
-        "groups":["sysadmin", "vpn"],
-        "comment":"Jane Doe",
-        "username":"jane",
-        "id":"jane",
-        ...
-        "vpn_password":"someverysecurepassword"
-    }
+```json
+{
+    "groups":["sysadmin", "vpn"],
+    "comment":"Jane Doe",
+    "username":"jane",
+    "id":"jane",
+    ...
+    "vpn_password":"someverysecurepassword"
+}
+```
 
+## Attributes
 
-Attributes
-----------
 Default attributes should be overwritten to match your role or environment needs.
 
     default['openswan']['ppp_link_network'] = "10.55.55.0"
@@ -28,9 +29,3 @@ Default attributes should be overwritten to match your role or environment needs
     default['openswan']['xl2tpd_path'] = "/etc/xl2tpd"
     default['openswan']['ppp_path'] = "/etc/ppp"
 
-
-License and Authors
--------------------
-Author: Blake Irvin (bixu@wanelo.com)
-
-Based on original work by Ryan Nelson (ryan.nelson@joyent.com), with input from Eric Saxby (sax@wanelo.com) and Konstanin Gredeskoul (kig@wanelo.com)
