@@ -1,0 +1,23 @@
+version 2.0
+
+config setup
+    nat_traversal=no
+    oe=off
+    protostack=netkey
+    virtual_private=%v4:<%= node['openswan']['ppp_link_network'] %>/24,%v4:<%= node['openswan']['private_ip'] %>/32
+
+conn tunnelipsec
+    authby=secret
+    auto=start
+    phase2alg=3des-md5
+    keyexchange=ike
+    pfs=no
+    type=tunnel
+
+    left=<%= node['ipaddress'] %>
+    leftsubnets={<%= node['openswan']['tunnel']['local']['subnets'].join(' ') %>}
+    leftnexthop=%defaultroute
+
+    right=<%= node['openswan']['tunnel']['remote']['ipaddress'] %>
+    rightsubnet=<%= node['openswan']['tunnel']['remote']['subnet'] %>
+    rightnexthop=%defaultroute
