@@ -1,9 +1,7 @@
 openswan
 ========
 
-## Description
-
-Collection of recipes that configure and install Ubuntu-based networking gateway, with support for for both peer-to-peer and site-to-site VPNs, and includes installation of ipsec, xl2tpd, and iptables for NAT routing.
+Collection of recipes that configure and install Ubuntu-based networking VPN gateway, with support for for both peer-to-peer and site-to-site VPN. It includes installation and configuration of ipsec and xl2tpd, as well as iptables services for NAT routing.
 
 ### L2TP over IpSec VPN
 
@@ -15,7 +13,11 @@ This recipe installs site-to-site VPN that's been verified to work with Cisco AS
 
 ## Requirements
 
-Currently tested only on Ubuntu 12, and expects a 'users' databag, with user records formatted like this:
+Currently tested only on Ubuntu 12.
+
+### Peer to Peer
+
+Expects a 'users' databag, with user records formatted like this:
 
 ```json
 {
@@ -44,7 +46,29 @@ In order to remove user record without deleting the data bag, add a key to the d
 
 This follows a precedent set in the `users` cookbook maintained by Opscode.
 
-## Attributes
+### Site to Site
+
+Example configuration:
+
+```ruby
+# Define locally routable subnets
+node.override['openswan']['tunnel']['local']['subnets'] = %w(
+  10.10.10.0/22
+  10.10.20.128/25
+  # etc...
+)
+
+# External to OpenSwan site's local subnet
+node.override['openswan']['tunnel']['remote']['subnet'] = '192.168.2.0/23'
+
+# Cisco ASA external IP
+node.override['openswan']['tunnel']['remote']['ipaddress'] = 'W.X.Y.Z' 
+
+# Run the recipe
+include_recipe 'openswan::tunnel'
+```
+
+### Attributes
 
 Default attributes should be overwritten to match your role or environment needs.
 
