@@ -52,17 +52,17 @@ Example configuration:
 
 ```ruby
 # Define locally routable subnets
-node.override['openswan']['tunnel']['local']['subnets'] = %w(
+node.override['openswan']['tunnel']['connections']['office']['local']['subnets'] = %w(
   10.10.10.0/22
   10.10.20.128/25
   # etc...
 )
 
 # External to OpenSwan site's local subnet
-node.override['openswan']['tunnel']['remote']['subnet'] = '192.168.2.0/23'
+node.override['openswan']['tunnel']['connections']['office']['remote']['subnets'] = %w( 192.168.2.0/23 )
 
 # Cisco ASA external IP
-node.override['openswan']['tunnel']['remote']['ipaddress'] = 'W.X.Y.Z' 
+node.override['openswan']['tunnel']['connections']['office']['remote']['ipaddress'] = 'W.X.Y.Z'
 
 # Run the recipe
 include_recipe 'openswan::tunnel'

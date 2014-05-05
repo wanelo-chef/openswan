@@ -6,7 +6,10 @@ config setup
     protostack=netkey
     virtual_private=%v4:<%= node['openswan']['ppp_link_network'] %>/24,%v4:<%= node['openswan']['private_ip'] %>/32
 
-conn tunnelipsec
+<%- if node['openswan']['tunnel']['connections'] &&
+       node['openswan']['tunnel']['connections'].size > 0 -%>
+   <%- node['openswan']['tunnel']['connections'].keys.each do |connection| -%>
+conn <%= connection %>
     authby=secret
     auto=start
     phase2alg=3des-md5
@@ -15,9 +18,12 @@ conn tunnelipsec
     type=tunnel
 
     left=<%= node['ipaddress'] %>
-    leftsubnets={<%= node['openswan']['tunnel']['local']['subnets'].join(' ') %>}
+    leftsubnets={<%= node['openswan']['tunnel']['connections'][connection]['local']['subnets'].join(' ') %>}
     leftnexthop=%defaultroute
 
-    right=<%= node['openswan']['tunnel']['remote']['ipaddress'] %>
-    rightsubnet=<%= node['openswan']['tunnel']['remote']['subnet'] %>
+    right=<%= node['openswan']['tunnel']['connections'][connection]['remote']['ipaddress'] %>
+    rightsubnets={<%= node['openswan']['tunnel']['connections'][connection]['remote']['subnets'].join(' ') %>}
     rightnexthop=%defaultroute
+
+  <%- end -%>
+<%- end -%>
