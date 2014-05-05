@@ -11,6 +11,9 @@ This recipe installs and configures openswan services for per-user l2tp over ips
 
 This recipe installs site-to-site VPN that's been verified to work with Cisco ASA 5000 series appliances. 
 
+*Warning*: the two recipes are currently incompatible (as they override /etc/ipsec.conf file). Meaning that you
+can either setup a tunnelling site-to-site VPN gateway, or user-based peer-to-peer L2TP VPN gateway, but not both on the same machine.  This is likely to be fixed in future versions.
+
 ## Requirements
 
 Currently tested only on Ubuntu 12.
