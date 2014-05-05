@@ -48,7 +48,7 @@ This follows a precedent set in the `users` cookbook maintained by Opscode.
 
 ### Site to Site
 
-Example configuration:
+Example configuration (where 'office' is just a name for the connection):
 
 ```ruby
 # Define locally routable subnets
@@ -59,9 +59,11 @@ node.override['openswan']['tunnel']['connections']['office']['local']['subnets']
 )
 
 # External to OpenSwan site's local subnet
-node.override['openswan']['tunnel']['connections']['office']['remote']['subnets'] = %w( 192.168.2.0/23 )
+node.override['openswan']['tunnel']['connections']['office']['remote']['subnets'] = %w( 
+  192.168.2.0/23 
+)
 
-# Cisco ASA external IP
+# VPN firewall external IP to connect to
 node.override['openswan']['tunnel']['connections']['office']['remote']['ipaddress'] = 'W.X.Y.Z'
 
 # Run the recipe
