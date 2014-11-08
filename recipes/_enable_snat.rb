@@ -2,7 +2,7 @@ public_interface = node['network']['interfaces'].detect { |k,v| v['addresses'].k
 
 execute "turn on public SNAT" do
   command "iptables -t nat -I POSTROUTING -o #{public_interface} -j SNAT --to #{node['ipaddress']}"
-  not_if "iptables -L -t nat | grep #{node['ipaddress']}"
+  not_if "iptables -L -t nat | grep #{node[:openswan][:public_ip]}"
   notifies :restart, "service[xl2tpd]"
   notifies :restart, "service[ipsec]"
 end

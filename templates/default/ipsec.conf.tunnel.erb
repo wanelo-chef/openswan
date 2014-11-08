@@ -17,7 +17,7 @@ conn <%= connection %>
     pfs=no
     type=tunnel
 
-    left=<%= node['ipaddress'] %>
+    left=<%= node['openswan']['public_ip'] %>
     leftsubnets={<%= node['openswan']['tunnel']['connections'][connection]['local']['subnets'].join(' ') %>}
     leftnexthop=%defaultroute
 
